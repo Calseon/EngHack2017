@@ -6,14 +6,26 @@ package enghack17.myowninstrument;
 
 public class DataFilter {
 
-    static final float ALPHA = 0.25f;
-
-    public float[] lowPass( float[] input, float[] output ) {
-        if (output == null) return input;
-
-        for (int i=0; i<input.length; i++) {
-            output[i] = output[i] + ALPHA * (input[i] - output[i]);
+    public float[] highpass(float alpha, float[] in)
+    {
+        float[] out = new float[in.length];
+        out[0] = 0;
+        for(int i = 1; i < in.length; i++)
+        {
+            out[i] = alpha * out[i-1] + alpha * (in[i] - in[i-1]);
         }
-        return output;
+        return out;
+    }
+
+    public float[] lowpass(float alpha, float[] in)
+    {
+
+        float[] out = new float[in.length];
+        out[0] = 0;
+        for(int i = 1; i < in.length; i++)
+        {
+            out[i] = alpha * in[i] + (1-alpha) * out[i-1];
+        }
+        return out;
     }
 }
