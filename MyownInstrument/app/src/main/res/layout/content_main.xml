@@ -32,52 +32,32 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Connect to Myo"
+        android:text="Myo Connection"
         android:id="@+id/buttonConnectMyo"
         android:layout_below="@+id/spinnerInstruments"
         android:layout_alignParentLeft="true"
         android:onClick="ConnectToMyo"/>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/buttonConnectMyo"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:layout_width="290dp"
+            android:layout_height="290dp"
+            android:id="@+id/imageView"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Message"
         android:id="@+id/textViewMessage"
-        android:textSize="40dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="X:"
-        android:id="@+id/textViewAccelX"
-        android:layout_below="@+id/buttonConnectMyo"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Y:"
-        android:id="@+id/textViewAccelY"
-        android:layout_below="@+id/textViewAccelX"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Z:"
-        android:id="@+id/textViewAccelZ"
-        android:layout_below="@+id/textViewAccelY"
-        android:layout_alignParentStart="true" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/textViewMessage"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="70dp"
-        android:id="@+id/layoutGraph"></FrameLayout>
+        android:layout_alignBaseline="@+id/buttonConnectMyo"
+        android:layout_alignBottom="@+id/buttonConnectMyo"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

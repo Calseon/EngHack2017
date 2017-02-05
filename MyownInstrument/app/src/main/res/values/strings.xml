@@ -10,10 +10,12 @@
     <string name="pose_wavein">Wave In</string>
     <string name="pose_waveout">Wave Out</string>
     <string name="pose_fingersspread">Fingers Spread</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
 
     <string-array name="instrument_array">
         <item>Drums</item>
-        <item>Marracas</item>
-        <item>Xylophone</item>
+        <item>Maracas</item>
+        <item>Piano</item>
     </string-array>
 </resources>
