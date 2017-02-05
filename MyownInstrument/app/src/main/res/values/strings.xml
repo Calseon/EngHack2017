@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Myown Instrument</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="instrument_array">
+        <item>Drums</item>
+        <item>Marracas</item>
+        <item>Xylophone</item>
+    </string-array>
+</resources>
