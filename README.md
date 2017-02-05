@@ -1,2 +1,2 @@
 # EngHack2017
-myo
+Myo armband project
