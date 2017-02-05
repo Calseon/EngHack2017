@@ -80,22 +80,4 @@
         android:layout_marginTop="70dp"
         android:id="@+id/layoutGraph"></FrameLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Drum"
-        android:id="@+id/buttonDrum"
-        android:layout_below="@+id/textViewAccelY"
-        android:layout_alignEnd="@+id/spinnerInstruments"
-        android:onClick="PlayDrum" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Maraca"
-        android:id="@+id/buttonMaraca"
-        android:layout_below="@+id/buttonDrum"
-        android:layout_alignStart="@+id/buttonDrum"
-        android:onClick="PlayMaraca" />
-
 </RelativeLayout>

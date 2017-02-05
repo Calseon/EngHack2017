@@ -5,7 +5,7 @@ package enghack17.myowninstrument;
  */
 
 public class DataFilter {
-    final float ALPHA = 0.25f;
+    final float ALPHA = 4f;
 
     public float[] highpass(float alpha, float[] in)
     {
