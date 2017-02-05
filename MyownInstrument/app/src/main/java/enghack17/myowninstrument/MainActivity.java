@@ -40,7 +40,7 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final String TAG = "MainActivity";
-    static final float ALPHA = 0.25f;
+
 
     // Frontend UI
     private TextView mTextView;
@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
         double oldAccelX = 0;
         double oldAccelY = 0;
         double oldAccelZ = 0;
+
+        DataFilter dataFilter = new DataFilter();
 
         // onConnect() is called whenever a Myo has been connected.
         @Override
@@ -158,9 +160,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onAccelerometerData(Myo myo, long timestamp, Vector3 accel)
         {
-            oldAccelX = lowPass(oldAccelX,accel.x());
-            oldAccelY = lowPass(oldAccelX,accel.y());
-            oldAccelZ = lowPass(oldAccelX,accel.z());
+            oldAccelX = dataFilter.lowPass(oldAccelX,accel.x());
+            oldAccelY = dataFilter.lowPass(oldAccelX,accel.y());
+            oldAccelZ = dataFilter.lowPass(oldAccelX,accel.z());
 
             accelXData.setText("X: " + Double.toString(oldAccelX));
             accelYData.setText("Y: " + Double.toString(oldAccelY));
@@ -285,8 +287,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void PlaySoundFile(int R_SoundAssetID)
-    {
+    private void PlaySoundFile(int R_SoundAssetID) {
         MediaPlayer mediaPlayer = new MediaPlayer();
         AssetFileDescriptor afd = this.getResources().openRawResourceFd(R_SoundAssetID);
 
@@ -298,9 +299,5 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public double lowPass(double oldValue, double newValue) {
-        return oldValue += (newValue - oldValue) / (1+ALPHA);
     }
 }
