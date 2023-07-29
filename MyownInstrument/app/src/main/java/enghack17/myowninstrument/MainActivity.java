@@ -5,7 +5,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,11 +20,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.Arm;
@@ -35,11 +34,13 @@ import com.thalmic.myo.Vector3;
 import com.thalmic.myo.XDirection;
 import com.thalmic.myo.scanner.ScanActivity;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final String TAG = "MainActivity";
+    static final float ALPHA = 0.25f;
 
     // Frontend UI
     private TextView mTextView;
@@ -52,6 +53,12 @@ public class MainActivity extends AppCompatActivity {
 
     // Device Listener for the Myo -----------------------------------------------------------
     private DeviceListener mListener = new AbstractDeviceListener() {
+
+        // Accelerometer data
+        double oldAccelX = 0;
+        double oldAccelY = 0;
+        double oldAccelZ = 0;
+
         // onConnect() is called whenever a Myo has been connected.
         @Override
         public void onConnect(Myo myo, long timestamp) {
@@ -151,10 +158,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onAccelerometerData(Myo myo, long timestamp, Vector3 accel)
         {
-            accelXData.setText("X: " + Double.toString(accel.x()));
-            accelYData.setText("Y: " + Double.toString(accel.y()));
-            accelZData.setText("Z: " + Double.toString(accel.z()));
-            float[] accelData = {(float)accel.x(), (float)accel.y(), (float)accel.z()};
+            oldAccelX = lowPass(oldAccelX,accel.x());
+            oldAccelY = lowPass(oldAccelX,accel.y());
+            oldAccelZ = lowPass(oldAccelX,accel.z());
+
+            accelXData.setText("X: " + Double.toString(oldAccelX));
+            accelYData.setText("Y: " + Double.toString(oldAccelY));
+            accelZData.setText("Z: " + Double.toString(oldAccelZ));
+            float[] accelData = {(float)oldAccelX, (float)oldAccelY, (float)oldAccelZ};
             graph.addPoint(accelData);
         }
     };
@@ -241,12 +252,6 @@ public class MainActivity extends AppCompatActivity {
         this.startActivity(intent);
     }
 
-    public void ForceConnectToMyo(View v)
-    {
-        // Use this instead to connect with a Myo that is very near (ie. almost touching) the device
-        Hub.getInstance().attachToAdjacentMyo();
-    }
-
     private void AcquirePerimissions()
     {
 
@@ -267,5 +272,35 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
             }
         }
+    }
+
+    public void PlayDrum(View v)
+    {
+        PlaySoundFile(R.raw.drum_sound);
+    }
+
+    public void PlayMaraca(View v)
+    {
+        PlaySoundFile(R.raw.maracasound);
+    }
+
+
+    private void PlaySoundFile(int R_SoundAssetID)
+    {
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        AssetFileDescriptor afd = this.getResources().openRawResourceFd(R_SoundAssetID);
+
+        try {
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public double lowPass(double oldValue, double newValue) {
+        return oldValue += (newValue - oldValue) / (1+ALPHA);
     }
 }
