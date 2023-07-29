@@ -48,7 +48,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView accelYData;
     private TextView accelZData;
     private LineGraphView graph;
+    private PulseDetect detectX;
+    private PulseDetect detectY;
+    private PulseDetect detectZ;
 
+    private Spinner spinner;
     Hub hub;
 
     // Device Listener for the Myo -----------------------------------------------------------
@@ -158,15 +162,28 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onAccelerometerData(Myo myo, long timestamp, Vector3 accel)
         {
-            oldAccelX = lowPass(oldAccelX,accel.x());
-            oldAccelY = lowPass(oldAccelX,accel.y());
-            oldAccelZ = lowPass(oldAccelX,accel.z());
+            oldAccelX = dataFilter.lowPass(oldAccelX,accel.x());
+            oldAccelY = dataFilter.lowPass(oldAccelX,accel.y());
+            oldAccelZ = dataFilter.lowPass(oldAccelX,accel.z());
 
-            accelXData.setText("X: " + Double.toString(oldAccelX));
-            accelYData.setText("Y: " + Double.toString(oldAccelY));
-            accelZData.setText("Z: " + Double.toString(oldAccelZ));
-            float[] accelData = {(float)oldAccelX, (float)oldAccelY, (float)oldAccelZ};
+            accelXData.setText("X: " + Double.toString(smoothedX));
+            accelYData.setText("Y: " + Double.toString(smoothedY));
+            accelZData.setText("Z: " + Double.toString(smoothedZ));
+            float[] accelData = {(float)smoothedX, (float)smoothedY, (float)smoothedZ};
             graph.addPoint(accelData);
+
+            detectX.AddNewPoint((smoothedX));
+            detectY.AddNewPoint((smoothedY));
+            detectZ.AddNewPoint((smoothedZ));
+
+            if (spinner.getSelectedItemPosition() == 0) {
+                if(detectX.pulseDetected())
+                    PlayInstrument();
+            } else if (spinner.getSelectedItemPosition() == 1) {
+                if (detectX.pulseDetected() || detectY.pulseDetected())
+                    PlayInstrument();
+            }
+            mTextView.setText("State: " + detectX.programState);
         }
     };
     // ----------------------------------------------------------------------------------------
@@ -190,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize UI variables
         FrameLayout mainlayout = (FrameLayout)findViewById(R.id.layoutGraph);
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinnerInstruments);
+        spinner = (Spinner) findViewById(R.id.spinnerInstruments);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
         R.array.instrument_array, android.R.layout.simple_spinner_item);
@@ -222,6 +239,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Next, register for DeviceListener callbacks.
         hub.addListener(mListener);
+
+        detectX = new PulseDetect();
+        detectY = new PulseDetect();
+        detectZ = new PulseDetect();
     }
 
     @Override
@@ -256,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
     {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                        // Android M Permission check 
+                        // Android M Permission check
             if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -271,6 +292,14 @@ public class MainActivity extends AppCompatActivity {
                 });
                 builder.show();
             }
+        }
+    }
+
+    public void PlayInstrument() {
+        if (spinner.getSelectedItemPosition() == 0) {
+            PlaySoundFile(R.raw.drum_sound);
+        } else if (spinner.getSelectedItemPosition() == 1) {
+            PlaySoundFile(R.raw.maracasound);
         }
     }
 
