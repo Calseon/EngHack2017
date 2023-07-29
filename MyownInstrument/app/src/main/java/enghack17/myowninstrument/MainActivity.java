@@ -18,8 +18,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -43,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
     static final float ALPHA = 0.25f;
 
     // Frontend UI
-    private TextView mTextView;
-    private TextView accelXData;
+   private TextView mTextView;
+   /* private TextView accelXData;
     private TextView accelYData;
-    private TextView accelZData;
+    private TextView accelZData;*/
     private LineGraphView graph;
     private PulseDetect detectX;
     private PulseDetect detectY;
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         public void onConnect(Myo myo, long timestamp) {
             // Set the text color of the text view to cyan when a Myo connects.
             mTextView.setTextColor(Color.CYAN);
+            mTextView.setText(R.string.connected);
             myo.unlock(Myo.UnlockType.HOLD);
         }
         // onDisconnect() is called whenever a Myo has been disconnected.
@@ -75,19 +78,20 @@ public class MainActivity extends AppCompatActivity {
         public void onDisconnect(Myo myo, long timestamp) {
             // Set the text color of the text view to red when a Myo disconnects.
             mTextView.setTextColor(Color.RED);
+            mTextView.setText(R.string.disconnected);
         }
         // onArmSync() is called whenever Myo has recognized a Sync Gesture after someone has put it on their
         // arm. This lets Myo know which arm it's on and which way it's facing.
         @Override
         public void onArmSync(Myo myo, long timestamp, Arm arm, XDirection xDirection) {
-            mTextView.setText(myo.getArm() == Arm.LEFT ? R.string.arm_left : R.string.arm_right);
+            //mTextView.setText(myo.getArm() == Arm.LEFT ? R.string.arm_left : R.string.arm_right);
         }
         // onArmUnsync() is called whenever Myo has detected that it was moved from a stable position on a person's arm after
         // it recognized the arm. Typically this happens when someone takes Myo off of their arm, but it can also happen
         // when Myo is moved around on the arm.
         @Override
         public void onArmUnsync(Myo myo, long timestamp) {
-            mTextView.setText(R.string.hello_world);
+            //mTextView.setText(R.string.hello_world);
         }
         // onUnlock() is called whenever a synced Myo has been unlocked. Under the standard locking
         // policy, that means poses will now be delivered to the listener.
@@ -115,48 +119,52 @@ public class MainActivity extends AppCompatActivity {
                 pitch *= -1;
             }
             // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
-            mTextView.setRotation(roll);
-            mTextView.setRotationX(pitch);
-            mTextView.setRotationY(yaw);
+            //mTextView.setRotation(roll);
+            //mTextView.setRotationX(pitch);
+           // mTextView.setRotationY(yaw);
         }
         // onPose() is called whenever a Myo provides a new pose.
         @Override
         public void onPose(Myo myo, long timestamp, Pose pose) {
-            // Handle the cases of the Pose enumeration, and change the text of the text view
-            // based on the pose we receive.
-            switch (pose) {
-                case UNKNOWN:
-                    mTextView.setText(getString(R.string.hello_world));
-                    break;
-                case REST:
-                case DOUBLE_TAP:
-                    int restTextId = R.string.hello_world;
-                    switch (myo.getArm()) {
-                        case LEFT:
-                            restTextId = R.string.arm_left;
-                            break;
-                        case RIGHT:
-                            restTextId = R.string.arm_right;
-                            break;
-                    }
-                    mTextView.setText(getString(restTextId));
-                    break;
-                case FIST:
-                    mTextView.setText(getString(R.string.pose_fist));
-                    break;
-                case WAVE_IN:
-                    mTextView.setText(getString(R.string.pose_wavein));
-                    break;
-                case WAVE_OUT:
-                    mTextView.setText(getString(R.string.pose_waveout));
-                    break;
-                case FINGERS_SPREAD:
-                    mTextView.setText(getString(R.string.pose_fingersspread));
-                    break;
-            }
 
-            // Stay permanently unlocked
-            myo.unlock(Myo.UnlockType.HOLD);
+            // Only run if we're performing piano
+            if (spinner.getSelectedItemPosition() == 2) {
+                // Handle the cases of the Pose enumeration, and change the text of the text view
+                // based on the pose we receive.
+                switch (pose) {
+                    case UNKNOWN:
+                        //mTextView.setText(getString(R.string.hello_world));
+                        break;
+                    case REST:
+                    case DOUBLE_TAP:
+                        int restTextId = R.string.hello_world;
+                        switch (myo.getArm()) {
+                            case LEFT:
+                                restTextId = R.string.arm_left;
+                                break;
+                            case RIGHT:
+                                restTextId = R.string.arm_right;
+                                break;
+                        }
+                       // mTextView.setText(getString(restTextId));
+                        break;
+                    case FIST:
+                       // mTextView.setText(getString(R.string.pose_fist));
+                        PlaySoundFile(R.raw.piano_d);
+                        break;
+                    case WAVE_IN:
+                        //mTextView.setText(getString(R.string.pose_wavein));
+                        PlaySoundFile(R.raw.piano_e);
+                        break;
+                    case WAVE_OUT:
+                        //mTextView.setText(getString(R.string.pose_waveout));
+                        PlaySoundFile(R.raw.piano_c);
+                        break;
+                    case FINGERS_SPREAD:
+                        //mTextView.setText(getString(R.string.pose_fingersspread));
+                        break;
+                }
+            }
         }
 
         @Override
@@ -166,9 +174,9 @@ public class MainActivity extends AppCompatActivity {
             oldAccelY = dataFilter.lowPass(oldAccelX,accel.y());
             oldAccelZ = dataFilter.lowPass(oldAccelX,accel.z());
 
-            accelXData.setText("X: " + Double.toString(smoothedX));
+            /*accelXData.setText("X: " + Double.toString(smoothedX));
             accelYData.setText("Y: " + Double.toString(smoothedY));
-            accelZData.setText("Z: " + Double.toString(smoothedZ));
+            accelZData.setText("Z: " + Double.toString(smoothedZ));*/
             float[] accelData = {(float)smoothedX, (float)smoothedY, (float)smoothedZ};
             graph.addPoint(accelData);
 
@@ -183,8 +191,9 @@ public class MainActivity extends AppCompatActivity {
                 if (detectX.pulseDetected() || detectY.pulseDetected())
                     PlayInstrument();
             }
-            mTextView.setText("State: " + detectX.programState);
+            //mTextView.setText("State: " + detectX.programState);
         }
+
     };
     // ----------------------------------------------------------------------------------------
 
@@ -193,19 +202,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         // Initialize UI variables
-        FrameLayout mainlayout = (FrameLayout)findViewById(R.id.layoutGraph);
+        //FrameLayout mainlayout = (FrameLayout)findViewById(R.id.layoutGraph);
 
         spinner = (Spinner) findViewById(R.id.spinnerInstruments);
         // Create an ArrayAdapter using the string array and a default spinner layout
@@ -215,16 +214,42 @@ public class MainActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                ImageView instrumentImage =  (ImageView) findViewById(R.id.imageView);
+
+                if (spinner.getSelectedItemPosition() == 0) {
+                    instrumentImage.setImageResource(R.drawable.drums);
+                }
+                else if (spinner.getSelectedItemPosition() == 1) {
+                    instrumentImage.setImageResource(R.drawable.maracas);
+                }
+                else if (spinner.getSelectedItemPosition() == 2) {
+                    instrumentImage.setImageResource(R.drawable.piano);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
 
         mTextView = (TextView) findViewById(R.id.textViewMessage);
-        accelXData = (TextView) findViewById(R.id.textViewAccelX);
+       /* accelXData = (TextView) findViewById(R.id.textViewAccelX);
         accelYData = (TextView) findViewById(R.id.textViewAccelY);
-        accelZData = (TextView) findViewById(R.id.textViewAccelZ);
+        accelZData = (TextView) findViewById(R.id.textViewAccelZ);*/
         graph = new LineGraphView(getApplicationContext(),
                 400,
                 Arrays.asList("X", "Y", "Z"));
+
+        /*graph = new LineGraphView(getApplicationContext(),
+                400,
+                Arrays.asList("EMG1", "EMG2", "EMG3", "EMG4", "EMG5", "EMG6", "EMG7", "EMG8"));
         mainlayout.addView(graph);
-        graph.setVisibility(View.VISIBLE);
+        graph.setVisibility(View.VISIBLE);*/
         AcquirePerimissions();
 
         // Initialize Myo
